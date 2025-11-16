@@ -229,6 +229,14 @@ abstract class FirebaseStorageHostApi {
   );
 
   @async
+  String referenceStreamData(
+    PigeonStorageFirebaseApp app,
+    PigeonStorageReference reference,
+    int maxSize,
+    int handle,
+  );
+
+  @async
   String referencePutData(
     PigeonStorageFirebaseApp app,
     PigeonStorageReference reference,

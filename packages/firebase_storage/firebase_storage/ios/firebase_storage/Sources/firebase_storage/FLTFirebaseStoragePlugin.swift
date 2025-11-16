@@ -169,6 +169,34 @@ public final class FLTFirebaseStoragePlugin: NSObject, FlutterPlugin, FirebaseSt
     }
   }
 
+  func referenceStreamData(app: PigeonStorageFirebaseApp, reference: PigeonStorageReference,
+                           maxSize: Int64, handle: Int64,
+                           completion: @escaping (Result<String, Error>) -> Void) {
+    let r = ref(app: app, reference: reference)
+    r.downloadURL { url, error in
+      if let e = error {
+        completion(.failure(self.toFlutterError(e)))
+      } else if let downloadUrl = url {
+        let uuid = UUID().uuidString
+        let channelName = "plugins.flutter.io/firebase_storage/taskEvent/\(uuid)"
+        let channel = FlutterEventChannel(name: channelName, binaryMessenger: self.messenger!)
+        let handler = DataStreamChannelStreamHandler(
+          downloadUrl: downloadUrl.absoluteString,
+          maxSize: maxSize
+        )
+        channel.setStreamHandler(handler)
+        self.eventChannels[channelName] = channel
+        completion(.success(uuid))
+      } else {
+        completion(.failure(FlutterError(
+          code: "unknown",
+          message: "Failed to get download URL",
+          details: nil
+        )))
+      }
+    }
+  }
+
   func referencePutData(app: PigeonStorageFirebaseApp, reference: PigeonStorageReference,
                         data: FlutterStandardTypedData, settableMetaData: PigeonSettableMetadata,
                         handle: Int64, completion: @escaping (Result<String, Error>) -> Void) {

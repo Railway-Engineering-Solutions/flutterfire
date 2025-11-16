@@ -193,6 +193,30 @@ class FlutterFirebaseStoragePlugin : FlutterFirebasePlugin, FlutterPlugin, Fireb
     }
   }
 
+  override fun referenceStreamData(
+    app: PigeonStorageFirebaseApp,
+    reference: PigeonStorageReference,
+    maxSize: Long,
+    handle: Long,
+    callback: (Result<String>) -> Unit
+  ) {
+    val androidReference = getReferenceFromPigeon(app, reference)
+    androidReference.downloadUrl.addOnCompleteListener { task ->
+      if (task.isSuccessful) {
+        val downloadUrl = task.result.toString()
+        try {
+          val identifier = UUID.randomUUID().toString().lowercase(Locale.US)
+          val handler = DataStreamChannelStreamHandler(downloadUrl, maxSize)
+          callback(Result.success(registerEventChannel("$STORAGE_METHOD_CHANNEL_NAME/$STORAGE_TASK_EVENT_NAME", identifier, handler)))
+        } catch (e: Exception) {
+          callback(Result.failure(FlutterFirebaseStorageException.parserExceptionToFlutter(e)))
+        }
+      } else {
+        callback(Result.failure(FlutterFirebaseStorageException.parserExceptionToFlutter(task.exception)))
+      }
+    }
+  }
+
   override fun referenceGetMetaData(
     app: PigeonStorageFirebaseApp,
     reference: PigeonStorageReference,

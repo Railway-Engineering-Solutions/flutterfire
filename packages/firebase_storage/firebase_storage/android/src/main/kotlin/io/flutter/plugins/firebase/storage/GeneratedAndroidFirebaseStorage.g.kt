@@ -336,6 +336,7 @@ interface FirebaseStorageHostApi {
   fun referenceList(app: PigeonStorageFirebaseApp, reference: PigeonStorageReference, options: PigeonListOptions, callback: (Result<PigeonListResult>) -> Unit)
   fun referenceListAll(app: PigeonStorageFirebaseApp, reference: PigeonStorageReference, callback: (Result<PigeonListResult>) -> Unit)
   fun referenceGetData(app: PigeonStorageFirebaseApp, reference: PigeonStorageReference, maxSize: Long, callback: (Result<ByteArray?>) -> Unit)
+  fun referenceStreamData(app: PigeonStorageFirebaseApp, reference: PigeonStorageReference, maxSize: Long, handle: Long, callback: (Result<String>) -> Unit)
   fun referencePutData(app: PigeonStorageFirebaseApp, reference: PigeonStorageReference, data: ByteArray, settableMetaData: PigeonSettableMetadata, handle: Long, callback: (Result<String>) -> Unit)
   fun referencePutString(app: PigeonStorageFirebaseApp, reference: PigeonStorageReference, data: String, format: Long, settableMetaData: PigeonSettableMetadata, handle: Long, callback: (Result<String>) -> Unit)
   fun referencePutFile(app: PigeonStorageFirebaseApp, reference: PigeonStorageReference, filePath: String, settableMetaData: PigeonSettableMetadata?, handle: Long, callback: (Result<String>) -> Unit)
@@ -570,6 +571,29 @@ interface FirebaseStorageHostApi {
             val referenceArg = args[1] as PigeonStorageReference
             val maxSizeArg = args[2].let { if (it is Int) it.toLong() else it as Long }
             api.referenceGetData(appArg, referenceArg, maxSizeArg) { result: Result<ByteArray?> ->
+              val error = result.exceptionOrNull()
+              if (error != null) {
+                reply.reply(wrapError(error))
+              } else {
+                val data = result.getOrNull()
+                reply.reply(wrapResult(data))
+              }
+            }
+          }
+        } else {
+          channel.setMessageHandler(null)
+        }
+      }
+      run {
+        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.firebase_storage_platform_interface.FirebaseStorageHostApi.referenceStreamData", codec)
+        if (api != null) {
+          channel.setMessageHandler { message, reply ->
+            val args = message as List<Any?>
+            val appArg = args[0] as PigeonStorageFirebaseApp
+            val referenceArg = args[1] as PigeonStorageReference
+            val maxSizeArg = args[2].let { if (it is Int) it.toLong() else it as Long }
+            val handleArg = args[3].let { if (it is Int) it.toLong() else it as Long }
+            api.referenceStreamData(appArg, referenceArg, maxSizeArg, handleArg) { result: Result<String> ->
               val error = result.exceptionOrNull()
               if (error != null) {
                 reply.reply(wrapError(error))

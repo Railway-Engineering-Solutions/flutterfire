@@ -308,6 +308,85 @@ Future<void> main() async {
       });
     });
 
+    group('getData()', () {
+      test('verify delegate method is called with default maxSize', () async {
+        final testData = Uint8List.fromList([1, 2, 3, 4, 5]);
+        when(mockReference.getData(10485760))
+            .thenAnswer((_) => Future.value(testData));
+
+        final result = await testRef.getData();
+
+        expect(result, isA<Uint8List>());
+        expect(result, testData);
+
+        verify(mockReference.getData(10485760));
+      });
+
+      test('verify delegate method is called with custom maxSize', () async {
+        final testData = Uint8List.fromList([1, 2, 3]);
+        const customMaxSize = 1024;
+        when(mockReference.getData(customMaxSize))
+            .thenAnswer((_) => Future.value(testData));
+
+        final result = await testRef.getData(customMaxSize);
+
+        expect(result, isA<Uint8List>());
+        expect(result, testData);
+
+        verify(mockReference.getData(customMaxSize));
+      });
+
+      test('throws AssertionError if maxSize is not greater than 0', () {
+        expect(() => testRef.getData(0), throwsAssertionError);
+      });
+    });
+
+    group('streamData()', () {
+      test('verify delegate method is called with default maxSize', () {
+        final testChunk1 = Uint8List.fromList([1, 2, 3]);
+        final testChunk2 = Uint8List.fromList([4, 5, 6]);
+        when(mockReference.streamData(10485760))
+            .thenAnswer((_) => Stream.fromIterable([testChunk1, testChunk2]));
+
+        final stream = testRef.streamData();
+
+        expect(stream, isA<Stream<Uint8List>>());
+
+        verify(mockReference.streamData(10485760));
+      });
+
+      test('verify delegate method is called with custom maxSize', () {
+        final testChunk = Uint8List.fromList([1, 2, 3]);
+        const customMaxSize = 1024;
+        when(mockReference.streamData(customMaxSize))
+            .thenAnswer((_) => Stream.value(testChunk));
+
+        final stream = testRef.streamData(customMaxSize);
+
+        expect(stream, isA<Stream<Uint8List>>());
+
+        verify(mockReference.streamData(customMaxSize));
+      });
+
+      test('throws AssertionError if maxSize is not greater than 0', () {
+        expect(() => testRef.streamData(0), throwsAssertionError);
+      });
+
+      test('streams data chunks correctly', () async {
+        final testChunk1 = Uint8List.fromList([1, 2, 3]);
+        final testChunk2 = Uint8List.fromList([4, 5, 6]);
+        when(mockReference.streamData(10485760))
+            .thenAnswer((_) => Stream.fromIterable([testChunk1, testChunk2]));
+
+        final stream = testRef.streamData();
+        final chunks = await stream.toList();
+
+        expect(chunks.length, 2);
+        expect(chunks[0], testChunk1);
+        expect(chunks[1], testChunk2);
+      });
+    });
+
     test('hashCode()', () {
       expect(testRef.hashCode, Object.hash(storage, testFullPath));
     });

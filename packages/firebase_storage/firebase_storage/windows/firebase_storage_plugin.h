@@ -95,6 +95,10 @@ class FirebaseStoragePlugin : public flutter::Plugin,
       const PigeonStorageReference& reference, int64_t max_size,
       std::function<void(ErrorOr<std::optional<std::vector<uint8_t>>> reply)>
           result) override;
+  virtual void ReferenceStreamData(
+      const PigeonStorageFirebaseApp& app,
+      const PigeonStorageReference& reference, int64_t max_size, int64_t handle,
+      std::function<void(ErrorOr<std::string> reply)> result) override;
   virtual void ReferencePutData(
       const PigeonStorageFirebaseApp& app,
       const PigeonStorageReference& reference, const std::vector<uint8_t>& data,

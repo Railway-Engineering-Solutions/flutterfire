@@ -513,6 +513,72 @@ void FirebaseStoragePlugin::ReferenceGetData(
       });
 }
 
+class DataStreamStreamHandler
+    : public flutter::StreamHandler<flutter::EncodableValue> {
+ public:
+  DataStreamStreamHandler(std::string download_url, int64_t max_size) {
+    download_url_ = download_url;
+    max_size_ = max_size;
+  }
+
+  std::unique_ptr<flutter::StreamHandlerError<flutter::EncodableValue>>
+  OnListenInternal(
+      const flutter::EncodableValue* arguments,
+      std::unique_ptr<flutter::EventSink<flutter::EncodableValue>>&& events)
+      override {
+    events_ = std::move(events);
+    // TODO: Implement HTTP streaming using WinHTTP or similar
+    // For now, this is a placeholder that needs HTTP client implementation
+    flutter::EncodableMap error_map = flutter::EncodableMap();
+    error_map["code"] = flutter::EncodableValue("unimplemented");
+    error_map["message"] = flutter::EncodableValue(
+        "Data streaming is not yet implemented for Windows platform");
+    flutter::EncodableMap event = flutter::EncodableMap();
+    event["error"] = error_map;
+    events_->Success(event);
+    return nullptr;
+  }
+
+  std::unique_ptr<flutter::StreamHandlerError<flutter::EncodableValue>>
+  OnCancelInternal(const flutter::EncodableValue* arguments) override {
+    return nullptr;
+  }
+
+ private:
+  std::string download_url_;
+  int64_t max_size_;
+  std::unique_ptr<flutter::EventSink<flutter::EncodableValue>> events_ =
+      nullptr;
+};
+
+void FirebaseStoragePlugin::ReferenceStreamData(
+    const PigeonStorageFirebaseApp& app,
+    const PigeonStorageReference& reference, int64_t max_size, int64_t handle,
+    std::function<void(ErrorOr<std::string> reply)> result) {
+  StorageReference cpp_reference =
+      GetCPPStorageReferenceFromPigeon(app, reference);
+
+  Future<std::string> future_result = cpp_reference.GetDownloadUrl();
+  ::Sleep(1);  // timing for c++ sdk grabbing a mutex
+
+  future_result.OnCompletion([result, max_size, handle](
+                                 const Future<std::string>& url_result) {
+    if (url_result.error() != firebase::storage::kErrorNone) {
+      result(FirebaseStoragePlugin::ParseError(url_result));
+    } else {
+      std::string download_url = *url_result.result();
+      auto handler = std::make_unique<DataStreamStreamHandler>(
+          download_url, max_size);
+
+      std::string channelName = RegisterEventChannel(
+          kStorageMethodChannelName + "/" + kStorageTaskEventName,
+          std::move(handler));
+
+      result(channelName);
+    }
+  });
+}
+
 std::string kTaskStateName = "taskState";
 std::string kTaskAppName = "appName";
 std::string kTaskSnapshotName = "snapshot";

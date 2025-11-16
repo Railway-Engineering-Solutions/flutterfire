@@ -7,6 +7,7 @@ import 'dart:convert';
 import 'dart:js_interop';
 import 'dart:typed_data';
 
+import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_storage_platform_interface/firebase_storage_platform_interface.dart';
 import 'package:http/http.dart' as http;
 import 'package:meta/meta.dart';
@@ -132,6 +133,66 @@ class ReferenceWeb extends ReferencePlatform {
       String url = await getDownloadURL();
       return readBytes(Uri.parse(url));
     });
+  }
+
+  /// Streams the object at the StorageReference as chunks of data.
+  ///
+  /// Returns a [Stream<Uint8List>] that emits data chunks as they are downloaded.
+  /// This allows for cancellation and progressive processing of large files.
+  @override
+  Stream<Uint8List> streamData(int maxSize) async* {
+    if (maxSize > 0) {
+      final metadata = await getMetadata();
+      if (metadata.size! > maxSize) {
+        throw FirebaseException(
+          plugin: 'firebase_storage',
+          code: 'download-size-exceeded',
+          message: 'File size exceeds maximum allowed size of $maxSize bytes',
+        );
+      }
+    }
+
+    try {
+      final url = await guard(() => getDownloadURL());
+      final request = http.Request('GET', Uri.parse(url));
+      final client = http.Client();
+      final response = await client.send(request);
+
+      if (response.statusCode != 200) {
+        client.close();
+        throw FirebaseException(
+          plugin: 'firebase_storage',
+          code: 'unknown',
+          message: 'Failed to download file: HTTP ${response.statusCode}',
+        );
+      }
+
+      int totalBytesReceived = 0;
+      try {
+        await for (final chunk in response.stream) {
+          totalBytesReceived += chunk.length;
+          if (maxSize > 0 && totalBytesReceived > maxSize) {
+            client.close();
+            throw FirebaseException(
+              plugin: 'firebase_storage',
+              code: 'download-size-exceeded',
+              message: 'Downloaded data exceeds maximum allowed size of $maxSize bytes',
+            );
+          }
+          yield chunk;
+        }
+      } finally {
+        client.close();
+      }
+    } catch (e) {
+      if (e is FirebaseException) {
+        rethrow;
+      }
+      // Wrap other errors using guard's error handling
+      guard(() {
+        throw e;
+      });
+    }
   }
 
   /// Uploads data to this reference's location.

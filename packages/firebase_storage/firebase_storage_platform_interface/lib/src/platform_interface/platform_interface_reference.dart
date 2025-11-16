@@ -126,6 +126,15 @@ abstract class ReferencePlatform extends PlatformInterface {
     throw UnimplementedError('getData() is not implemented');
   }
 
+  /// Streams the object at the StorageReference as chunks of data.
+  ///
+  /// Returns a [Stream<Uint8List>] that emits data chunks as they are downloaded.
+  /// This allows for cancellation and progressive processing of large files.
+  /// If the [maxSize] (in bytes) is exceeded, the stream will emit an error.
+  Stream<Uint8List> streamData(int maxSize) {
+    throw UnimplementedError('streamData() is not implemented');
+  }
+
   /// Uploads data to this reference's location.
   ///
   /// Use this method to upload fixed sized data as a [Uint8List].

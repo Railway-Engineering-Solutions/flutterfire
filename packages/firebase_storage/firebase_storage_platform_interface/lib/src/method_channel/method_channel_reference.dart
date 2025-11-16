@@ -7,6 +7,9 @@ import 'dart:async';
 import 'dart:io';
 import 'dart:typed_data';
 
+import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter/services.dart';
+
 import '../../firebase_storage_platform_interface.dart';
 import '../pigeon/messages.pigeon.dart';
 import 'method_channel_firebase_storage.dart';
@@ -142,6 +145,70 @@ class MethodChannelReference extends ReferencePlatform {
     try {
       return await MethodChannelFirebaseStorage.pigeonChannel
           .referenceGetData(pigeonFirebaseApp, pigeonReference, maxSize);
+    } catch (e, stack) {
+      convertPlatformException(e, stack);
+    }
+  }
+
+  @override
+  Stream<Uint8List> streamData(int maxSize) async* {
+    try {
+      final handle = MethodChannelFirebaseStorage.nextMethodChannelHandleId;
+      final channelName = await MethodChannelFirebaseStorage.pigeonChannel
+          .referenceStreamData(
+              pigeonFirebaseApp, pigeonReference, maxSize, handle);
+
+      final eventChannel = EventChannel(channelName);
+      final stream = eventChannel.receiveBroadcastStream();
+
+      int totalBytesReceived = 0;
+      await for (final event in stream) {
+        if (event is Map) {
+          final eventMap = Map<String, dynamic>.from(event);
+          
+          // Check for error events
+          if (eventMap.containsKey('error')) {
+            final errorMap = Map<String, dynamic>.from(eventMap['error']);
+            throw FirebaseException(
+              plugin: 'firebase_storage',
+              code: errorMap['code'] ?? 'unknown',
+              message: errorMap['message'] ?? 'An error occurred',
+            );
+          }
+          
+          // Check for data chunks
+          if (eventMap.containsKey('data')) {
+            final data = eventMap['data'];
+            if (data is Uint8List) {
+              totalBytesReceived += data.length;
+              if (maxSize > 0 && totalBytesReceived > maxSize) {
+                throw FirebaseException(
+                  plugin: 'firebase_storage',
+                  code: 'download-size-exceeded',
+                  message: 'Downloaded data exceeds maximum allowed size of $maxSize bytes',
+                );
+              }
+              yield data;
+            }
+          }
+          
+          // Check for completion
+          if (eventMap.containsKey('complete') && eventMap['complete'] == true) {
+            break;
+          }
+        } else if (event is Uint8List) {
+          // Direct data chunk
+          totalBytesReceived += event.length;
+          if (maxSize > 0 && totalBytesReceived > maxSize) {
+            throw FirebaseException(
+              plugin: 'firebase_storage',
+              code: 'download-size-exceeded',
+              message: 'Downloaded data exceeds maximum allowed size of $maxSize bytes',
+            );
+          }
+          yield event;
+        }
+      }
     } catch (e, stack) {
       convertPlatformException(e, stack);
     }

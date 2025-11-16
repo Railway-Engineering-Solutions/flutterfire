@@ -6,19 +6,19 @@
 
 import Foundation
 #if os(iOS)
-  import Flutter
+import Flutter
 #elseif os(macOS)
-  import FlutterMacOS
+import FlutterMacOS
 #else
-  #error("Unsupported platform.")
+#error("Unsupported platform.")
 #endif
 
 private func isNullish(_ value: Any?) -> Bool {
-  value is NSNull || value == nil
+  return value is NSNull || value == nil
 }
 
 private func wrapResult(_ result: Any?) -> [Any?] {
-  [result]
+  return [result]
 }
 
 private func wrapError(_ error: Any) -> [Any?] {
@@ -26,13 +26,13 @@ private func wrapError(_ error: Any) -> [Any?] {
     return [
       flutterError.code,
       flutterError.message,
-      flutterError.details,
+      flutterError.details
     ]
   }
   return [
     "\(error)",
     "\(type(of: error))",
-    "Stacktrace: \(Thread.callStackSymbols)",
+    "Stacktrace: \(Thread.callStackSymbols)"
   ]
 }
 
@@ -59,7 +59,7 @@ enum PigeonStorageTaskState: Int {
 /// Generated class from Pigeon that represents data sent in messages.
 struct PigeonStorageFirebaseApp {
   var appName: String
-  var tenantId: String?
+  var tenantId: String? = nil
   var bucket: String
 
   static func fromList(_ list: [Any?]) -> PigeonStorageFirebaseApp? {
@@ -73,9 +73,8 @@ struct PigeonStorageFirebaseApp {
       bucket: bucket
     )
   }
-
   func toList() -> [Any?] {
-    [
+    return [
       appName,
       tenantId,
       bucket,
@@ -100,9 +99,8 @@ struct PigeonStorageReference {
       name: name
     )
   }
-
   func toList() -> [Any?] {
-    [
+    return [
       bucket,
       fullPath,
       name,
@@ -112,7 +110,7 @@ struct PigeonStorageReference {
 
 /// Generated class from Pigeon that represents data sent in messages.
 struct PigeonFullMetaData {
-  var metadata: [String?: Any?]?
+  var metadata: [String?: Any?]? = nil
 
   static func fromList(_ list: [Any?]) -> PigeonFullMetaData? {
     let metadata: [String?: Any?]? = nilOrValue(list[0])
@@ -121,9 +119,8 @@ struct PigeonFullMetaData {
       metadata: metadata
     )
   }
-
   func toList() -> [Any?] {
-    [
+    return [
       metadata,
     ]
   }
@@ -138,7 +135,7 @@ struct PigeonListOptions {
   /// The nextPageToken from a previous call to list().
   ///
   /// If provided, listing is resumed from the previous position.
-  var pageToken: String?
+  var pageToken: String? = nil
 
   static func fromList(_ list: [Any?]) -> PigeonListOptions? {
     let maxResults = list[0] is Int64 ? list[0] as! Int64 : Int64(list[0] as! Int32)
@@ -149,9 +146,8 @@ struct PigeonListOptions {
       pageToken: pageToken
     )
   }
-
   func toList() -> [Any?] {
-    [
+    return [
       maxResults,
       pageToken,
     ]
@@ -163,25 +159,25 @@ struct PigeonSettableMetadata {
   /// Served as the 'Cache-Control' header on object download.
   ///
   /// See https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Cache-Control.
-  var cacheControl: String?
+  var cacheControl: String? = nil
   /// Served as the 'Content-Disposition' header on object download.
   ///
   /// See https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Disposition.
-  var contentDisposition: String?
+  var contentDisposition: String? = nil
   /// Served as the 'Content-Encoding' header on object download.
   ///
   /// See https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Encoding.
-  var contentEncoding: String?
+  var contentEncoding: String? = nil
   /// Served as the 'Content-Language' header on object download.
   ///
   /// See https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Language.
-  var contentLanguage: String?
+  var contentLanguage: String? = nil
   /// Served as the 'Content-Type' header on object download.
   ///
   /// See https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Type.
-  var contentType: String?
+  var contentType: String? = nil
   /// Additional user-defined custom metadata.
-  var customMetadata: [String?: String?]?
+  var customMetadata: [String?: String?]? = nil
 
   static func fromList(_ list: [Any?]) -> PigeonSettableMetadata? {
     let cacheControl: String? = nilOrValue(list[0])
@@ -200,9 +196,8 @@ struct PigeonSettableMetadata {
       customMetadata: customMetadata
     )
   }
-
   func toList() -> [Any?] {
-    [
+    return [
       cacheControl,
       contentDisposition,
       contentEncoding,
@@ -216,7 +211,7 @@ struct PigeonSettableMetadata {
 /// Generated class from Pigeon that represents data sent in messages.
 struct PigeonListResult {
   var items: [PigeonStorageReference?]
-  var pageToken: String?
+  var pageToken: String? = nil
   var prefixs: [PigeonStorageReference?]
 
   static func fromList(_ list: [Any?]) -> PigeonListResult? {
@@ -230,9 +225,8 @@ struct PigeonListResult {
       prefixs: prefixs
     )
   }
-
   func toList() -> [Any?] {
-    [
+    return [
       items,
       pageToken,
       prefixs,
@@ -243,20 +237,20 @@ struct PigeonListResult {
 private class FirebaseStorageHostApiCodecReader: FlutterStandardReader {
   override func readValue(ofType type: UInt8) -> Any? {
     switch type {
-    case 128:
-      return PigeonFullMetaData.fromList(readValue() as! [Any?])
-    case 129:
-      return PigeonListOptions.fromList(readValue() as! [Any?])
-    case 130:
-      return PigeonListResult.fromList(readValue() as! [Any?])
-    case 131:
-      return PigeonSettableMetadata.fromList(readValue() as! [Any?])
-    case 132:
-      return PigeonStorageFirebaseApp.fromList(readValue() as! [Any?])
-    case 133:
-      return PigeonStorageReference.fromList(readValue() as! [Any?])
-    default:
-      return super.readValue(ofType: type)
+      case 128:
+        return PigeonFullMetaData.fromList(self.readValue() as! [Any?])
+      case 129:
+        return PigeonListOptions.fromList(self.readValue() as! [Any?])
+      case 130:
+        return PigeonListResult.fromList(self.readValue() as! [Any?])
+      case 131:
+        return PigeonSettableMetadata.fromList(self.readValue() as! [Any?])
+      case 132:
+        return PigeonStorageFirebaseApp.fromList(self.readValue() as! [Any?])
+      case 133:
+        return PigeonStorageReference.fromList(self.readValue() as! [Any?])
+      default:
+        return super.readValue(ofType: type)
     }
   }
 }
@@ -289,81 +283,50 @@ private class FirebaseStorageHostApiCodecWriter: FlutterStandardWriter {
 
 private class FirebaseStorageHostApiCodecReaderWriter: FlutterStandardReaderWriter {
   override func reader(with data: Data) -> FlutterStandardReader {
-    FirebaseStorageHostApiCodecReader(data: data)
+    return FirebaseStorageHostApiCodecReader(data: data)
   }
 
   override func writer(with data: NSMutableData) -> FlutterStandardWriter {
-    FirebaseStorageHostApiCodecWriter(data: data)
+    return FirebaseStorageHostApiCodecWriter(data: data)
   }
 }
 
 class FirebaseStorageHostApiCodec: FlutterStandardMessageCodec {
-  static let shared =
-    FirebaseStorageHostApiCodec(readerWriter: FirebaseStorageHostApiCodecReaderWriter())
+  static let shared = FirebaseStorageHostApiCodec(readerWriter: FirebaseStorageHostApiCodecReaderWriter())
 }
 
 /// Generated protocol from Pigeon that represents a handler of messages from Flutter.
 protocol FirebaseStorageHostApi {
-  func getReferencebyPath(app: PigeonStorageFirebaseApp, path: String, bucket: String?,
-                          completion: @escaping (Result<PigeonStorageReference, Error>) -> Void)
-  func setMaxOperationRetryTime(app: PigeonStorageFirebaseApp, time: Int64,
-                                completion: @escaping (Result<Void, Error>) -> Void)
-  func setMaxUploadRetryTime(app: PigeonStorageFirebaseApp, time: Int64,
-                             completion: @escaping (Result<Void, Error>) -> Void)
-  func setMaxDownloadRetryTime(app: PigeonStorageFirebaseApp, time: Int64,
-                               completion: @escaping (Result<Void, Error>) -> Void)
-  func useStorageEmulator(app: PigeonStorageFirebaseApp, host: String, port: Int64,
-                          completion: @escaping (Result<Void, Error>) -> Void)
-  func referenceDelete(app: PigeonStorageFirebaseApp, reference: PigeonStorageReference,
-                       completion: @escaping (Result<Void, Error>) -> Void)
-  func referenceGetDownloadURL(app: PigeonStorageFirebaseApp, reference: PigeonStorageReference,
-                               completion: @escaping (Result<String, Error>) -> Void)
-  func referenceGetMetaData(app: PigeonStorageFirebaseApp, reference: PigeonStorageReference,
-                            completion: @escaping (Result<PigeonFullMetaData, Error>) -> Void)
-  func referenceList(app: PigeonStorageFirebaseApp, reference: PigeonStorageReference,
-                     options: PigeonListOptions,
-                     completion: @escaping (Result<PigeonListResult, Error>) -> Void)
-  func referenceListAll(app: PigeonStorageFirebaseApp, reference: PigeonStorageReference,
-                        completion: @escaping (Result<PigeonListResult, Error>) -> Void)
-  func referenceGetData(app: PigeonStorageFirebaseApp, reference: PigeonStorageReference,
-                        maxSize: Int64,
-                        completion: @escaping (Result<FlutterStandardTypedData?, Error>) -> Void)
-  func referencePutData(app: PigeonStorageFirebaseApp, reference: PigeonStorageReference,
-                        data: FlutterStandardTypedData, settableMetaData: PigeonSettableMetadata,
-                        handle: Int64, completion: @escaping (Result<String, Error>) -> Void)
-  func referencePutString(app: PigeonStorageFirebaseApp, reference: PigeonStorageReference,
-                          data: String, format: Int64, settableMetaData: PigeonSettableMetadata,
-                          handle: Int64, completion: @escaping (Result<String, Error>) -> Void)
-  func referencePutFile(app: PigeonStorageFirebaseApp, reference: PigeonStorageReference,
-                        filePath: String, settableMetaData: PigeonSettableMetadata?, handle: Int64,
-                        completion: @escaping (Result<String, Error>) -> Void)
-  func referenceDownloadFile(app: PigeonStorageFirebaseApp, reference: PigeonStorageReference,
-                             filePath: String, handle: Int64,
-                             completion: @escaping (Result<String, Error>) -> Void)
-  func referenceUpdateMetadata(app: PigeonStorageFirebaseApp, reference: PigeonStorageReference,
-                               metadata: PigeonSettableMetadata,
-                               completion: @escaping (Result<PigeonFullMetaData, Error>) -> Void)
-  func taskPause(app: PigeonStorageFirebaseApp, handle: Int64,
-                 completion: @escaping (Result<[String: Any], Error>) -> Void)
-  func taskResume(app: PigeonStorageFirebaseApp, handle: Int64,
-                  completion: @escaping (Result<[String: Any], Error>) -> Void)
-  func taskCancel(app: PigeonStorageFirebaseApp, handle: Int64,
-                  completion: @escaping (Result<[String: Any], Error>) -> Void)
+  func getReferencebyPath(app: PigeonStorageFirebaseApp, path: String, bucket: String?, completion: @escaping (Result<PigeonStorageReference, Error>) -> Void)
+  func setMaxOperationRetryTime(app: PigeonStorageFirebaseApp, time: Int64, completion: @escaping (Result<Void, Error>) -> Void)
+  func setMaxUploadRetryTime(app: PigeonStorageFirebaseApp, time: Int64, completion: @escaping (Result<Void, Error>) -> Void)
+  func setMaxDownloadRetryTime(app: PigeonStorageFirebaseApp, time: Int64, completion: @escaping (Result<Void, Error>) -> Void)
+  func useStorageEmulator(app: PigeonStorageFirebaseApp, host: String, port: Int64, completion: @escaping (Result<Void, Error>) -> Void)
+  func referenceDelete(app: PigeonStorageFirebaseApp, reference: PigeonStorageReference, completion: @escaping (Result<Void, Error>) -> Void)
+  func referenceGetDownloadURL(app: PigeonStorageFirebaseApp, reference: PigeonStorageReference, completion: @escaping (Result<String, Error>) -> Void)
+  func referenceGetMetaData(app: PigeonStorageFirebaseApp, reference: PigeonStorageReference, completion: @escaping (Result<PigeonFullMetaData, Error>) -> Void)
+  func referenceList(app: PigeonStorageFirebaseApp, reference: PigeonStorageReference, options: PigeonListOptions, completion: @escaping (Result<PigeonListResult, Error>) -> Void)
+  func referenceListAll(app: PigeonStorageFirebaseApp, reference: PigeonStorageReference, completion: @escaping (Result<PigeonListResult, Error>) -> Void)
+  func referenceGetData(app: PigeonStorageFirebaseApp, reference: PigeonStorageReference, maxSize: Int64, completion: @escaping (Result<FlutterStandardTypedData?, Error>) -> Void)
+  func referenceStreamData(app: PigeonStorageFirebaseApp, reference: PigeonStorageReference, maxSize: Int64, handle: Int64, completion: @escaping (Result<String, Error>) -> Void)
+  func referencePutData(app: PigeonStorageFirebaseApp, reference: PigeonStorageReference, data: FlutterStandardTypedData, settableMetaData: PigeonSettableMetadata, handle: Int64, completion: @escaping (Result<String, Error>) -> Void)
+  func referencePutString(app: PigeonStorageFirebaseApp, reference: PigeonStorageReference, data: String, format: Int64, settableMetaData: PigeonSettableMetadata, handle: Int64, completion: @escaping (Result<String, Error>) -> Void)
+  func referencePutFile(app: PigeonStorageFirebaseApp, reference: PigeonStorageReference, filePath: String, settableMetaData: PigeonSettableMetadata?, handle: Int64, completion: @escaping (Result<String, Error>) -> Void)
+  func referenceDownloadFile(app: PigeonStorageFirebaseApp, reference: PigeonStorageReference, filePath: String, handle: Int64, completion: @escaping (Result<String, Error>) -> Void)
+  func referenceUpdateMetadata(app: PigeonStorageFirebaseApp, reference: PigeonStorageReference, metadata: PigeonSettableMetadata, completion: @escaping (Result<PigeonFullMetaData, Error>) -> Void)
+  func taskPause(app: PigeonStorageFirebaseApp, handle: Int64, completion: @escaping (Result<[String: Any], Error>) -> Void)
+  func taskResume(app: PigeonStorageFirebaseApp, handle: Int64, completion: @escaping (Result<[String: Any], Error>) -> Void)
+  func taskCancel(app: PigeonStorageFirebaseApp, handle: Int64, completion: @escaping (Result<[String: Any], Error>) -> Void)
 }
 
 /// Generated setup class from Pigeon to handle messages through the `binaryMessenger`.
 class FirebaseStorageHostApiSetup {
   /// The codec used by FirebaseStorageHostApi.
   static var codec: FlutterStandardMessageCodec { FirebaseStorageHostApiCodec.shared }
-  /// Sets up an instance of `FirebaseStorageHostApi` to handle messages through the
-  /// `binaryMessenger`.
+  /// Sets up an instance of `FirebaseStorageHostApi` to handle messages through the `binaryMessenger`.
   static func setUp(binaryMessenger: FlutterBinaryMessenger, api: FirebaseStorageHostApi?) {
-    let getReferencebyPathChannel = FlutterBasicMessageChannel(
-      name: "dev.flutter.pigeon.firebase_storage_platform_interface.FirebaseStorageHostApi.getReferencebyPath",
-      binaryMessenger: binaryMessenger,
-      codec: codec
-    )
-    if let api {
+    let getReferencebyPathChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.firebase_storage_platform_interface.FirebaseStorageHostApi.getReferencebyPath", binaryMessenger: binaryMessenger, codec: codec)
+    if let api = api {
       getReferencebyPathChannel.setMessageHandler { message, reply in
         let args = message as! [Any?]
         let appArg = args[0] as! PigeonStorageFirebaseApp
@@ -371,88 +334,72 @@ class FirebaseStorageHostApiSetup {
         let bucketArg: String? = nilOrValue(args[2])
         api.getReferencebyPath(app: appArg, path: pathArg, bucket: bucketArg) { result in
           switch result {
-          case let .success(res):
-            reply(wrapResult(res))
-          case let .failure(error):
-            reply(wrapError(error))
+            case .success(let res):
+              reply(wrapResult(res))
+            case .failure(let error):
+              reply(wrapError(error))
           }
         }
       }
     } else {
       getReferencebyPathChannel.setMessageHandler(nil)
     }
-    let setMaxOperationRetryTimeChannel = FlutterBasicMessageChannel(
-      name: "dev.flutter.pigeon.firebase_storage_platform_interface.FirebaseStorageHostApi.setMaxOperationRetryTime",
-      binaryMessenger: binaryMessenger,
-      codec: codec
-    )
-    if let api {
+    let setMaxOperationRetryTimeChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.firebase_storage_platform_interface.FirebaseStorageHostApi.setMaxOperationRetryTime", binaryMessenger: binaryMessenger, codec: codec)
+    if let api = api {
       setMaxOperationRetryTimeChannel.setMessageHandler { message, reply in
         let args = message as! [Any?]
         let appArg = args[0] as! PigeonStorageFirebaseApp
         let timeArg = args[1] is Int64 ? args[1] as! Int64 : Int64(args[1] as! Int32)
         api.setMaxOperationRetryTime(app: appArg, time: timeArg) { result in
           switch result {
-          case .success:
-            reply(wrapResult(nil))
-          case let .failure(error):
-            reply(wrapError(error))
+            case .success:
+              reply(wrapResult(nil))
+            case .failure(let error):
+              reply(wrapError(error))
           }
         }
       }
     } else {
       setMaxOperationRetryTimeChannel.setMessageHandler(nil)
     }
-    let setMaxUploadRetryTimeChannel = FlutterBasicMessageChannel(
-      name: "dev.flutter.pigeon.firebase_storage_platform_interface.FirebaseStorageHostApi.setMaxUploadRetryTime",
-      binaryMessenger: binaryMessenger,
-      codec: codec
-    )
-    if let api {
+    let setMaxUploadRetryTimeChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.firebase_storage_platform_interface.FirebaseStorageHostApi.setMaxUploadRetryTime", binaryMessenger: binaryMessenger, codec: codec)
+    if let api = api {
       setMaxUploadRetryTimeChannel.setMessageHandler { message, reply in
         let args = message as! [Any?]
         let appArg = args[0] as! PigeonStorageFirebaseApp
         let timeArg = args[1] is Int64 ? args[1] as! Int64 : Int64(args[1] as! Int32)
         api.setMaxUploadRetryTime(app: appArg, time: timeArg) { result in
           switch result {
-          case .success:
-            reply(wrapResult(nil))
-          case let .failure(error):
-            reply(wrapError(error))
+            case .success:
+              reply(wrapResult(nil))
+            case .failure(let error):
+              reply(wrapError(error))
           }
         }
       }
     } else {
       setMaxUploadRetryTimeChannel.setMessageHandler(nil)
     }
-    let setMaxDownloadRetryTimeChannel = FlutterBasicMessageChannel(
-      name: "dev.flutter.pigeon.firebase_storage_platform_interface.FirebaseStorageHostApi.setMaxDownloadRetryTime",
-      binaryMessenger: binaryMessenger,
-      codec: codec
-    )
-    if let api {
+    let setMaxDownloadRetryTimeChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.firebase_storage_platform_interface.FirebaseStorageHostApi.setMaxDownloadRetryTime", binaryMessenger: binaryMessenger, codec: codec)
+    if let api = api {
       setMaxDownloadRetryTimeChannel.setMessageHandler { message, reply in
         let args = message as! [Any?]
         let appArg = args[0] as! PigeonStorageFirebaseApp
         let timeArg = args[1] is Int64 ? args[1] as! Int64 : Int64(args[1] as! Int32)
         api.setMaxDownloadRetryTime(app: appArg, time: timeArg) { result in
           switch result {
-          case .success:
-            reply(wrapResult(nil))
-          case let .failure(error):
-            reply(wrapError(error))
+            case .success:
+              reply(wrapResult(nil))
+            case .failure(let error):
+              reply(wrapError(error))
           }
         }
       }
     } else {
       setMaxDownloadRetryTimeChannel.setMessageHandler(nil)
     }
-    let useStorageEmulatorChannel = FlutterBasicMessageChannel(
-      name: "dev.flutter.pigeon.firebase_storage_platform_interface.FirebaseStorageHostApi.useStorageEmulator",
-      binaryMessenger: binaryMessenger,
-      codec: codec
-    )
-    if let api {
+    let useStorageEmulatorChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.firebase_storage_platform_interface.FirebaseStorageHostApi.useStorageEmulator", binaryMessenger: binaryMessenger, codec: codec)
+    if let api = api {
       useStorageEmulatorChannel.setMessageHandler { message, reply in
         let args = message as! [Any?]
         let appArg = args[0] as! PigeonStorageFirebaseApp
@@ -460,88 +407,72 @@ class FirebaseStorageHostApiSetup {
         let portArg = args[2] is Int64 ? args[2] as! Int64 : Int64(args[2] as! Int32)
         api.useStorageEmulator(app: appArg, host: hostArg, port: portArg) { result in
           switch result {
-          case .success:
-            reply(wrapResult(nil))
-          case let .failure(error):
-            reply(wrapError(error))
+            case .success:
+              reply(wrapResult(nil))
+            case .failure(let error):
+              reply(wrapError(error))
           }
         }
       }
     } else {
       useStorageEmulatorChannel.setMessageHandler(nil)
     }
-    let referenceDeleteChannel = FlutterBasicMessageChannel(
-      name: "dev.flutter.pigeon.firebase_storage_platform_interface.FirebaseStorageHostApi.referenceDelete",
-      binaryMessenger: binaryMessenger,
-      codec: codec
-    )
-    if let api {
+    let referenceDeleteChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.firebase_storage_platform_interface.FirebaseStorageHostApi.referenceDelete", binaryMessenger: binaryMessenger, codec: codec)
+    if let api = api {
       referenceDeleteChannel.setMessageHandler { message, reply in
         let args = message as! [Any?]
         let appArg = args[0] as! PigeonStorageFirebaseApp
         let referenceArg = args[1] as! PigeonStorageReference
         api.referenceDelete(app: appArg, reference: referenceArg) { result in
           switch result {
-          case .success:
-            reply(wrapResult(nil))
-          case let .failure(error):
-            reply(wrapError(error))
+            case .success:
+              reply(wrapResult(nil))
+            case .failure(let error):
+              reply(wrapError(error))
           }
         }
       }
     } else {
       referenceDeleteChannel.setMessageHandler(nil)
     }
-    let referenceGetDownloadURLChannel = FlutterBasicMessageChannel(
-      name: "dev.flutter.pigeon.firebase_storage_platform_interface.FirebaseStorageHostApi.referenceGetDownloadURL",
-      binaryMessenger: binaryMessenger,
-      codec: codec
-    )
-    if let api {
+    let referenceGetDownloadURLChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.firebase_storage_platform_interface.FirebaseStorageHostApi.referenceGetDownloadURL", binaryMessenger: binaryMessenger, codec: codec)
+    if let api = api {
       referenceGetDownloadURLChannel.setMessageHandler { message, reply in
         let args = message as! [Any?]
         let appArg = args[0] as! PigeonStorageFirebaseApp
         let referenceArg = args[1] as! PigeonStorageReference
         api.referenceGetDownloadURL(app: appArg, reference: referenceArg) { result in
           switch result {
-          case let .success(res):
-            reply(wrapResult(res))
-          case let .failure(error):
-            reply(wrapError(error))
+            case .success(let res):
+              reply(wrapResult(res))
+            case .failure(let error):
+              reply(wrapError(error))
           }
         }
       }
     } else {
       referenceGetDownloadURLChannel.setMessageHandler(nil)
     }
-    let referenceGetMetaDataChannel = FlutterBasicMessageChannel(
-      name: "dev.flutter.pigeon.firebase_storage_platform_interface.FirebaseStorageHostApi.referenceGetMetaData",
-      binaryMessenger: binaryMessenger,
-      codec: codec
-    )
-    if let api {
+    let referenceGetMetaDataChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.firebase_storage_platform_interface.FirebaseStorageHostApi.referenceGetMetaData", binaryMessenger: binaryMessenger, codec: codec)
+    if let api = api {
       referenceGetMetaDataChannel.setMessageHandler { message, reply in
         let args = message as! [Any?]
         let appArg = args[0] as! PigeonStorageFirebaseApp
         let referenceArg = args[1] as! PigeonStorageReference
         api.referenceGetMetaData(app: appArg, reference: referenceArg) { result in
           switch result {
-          case let .success(res):
-            reply(wrapResult(res))
-          case let .failure(error):
-            reply(wrapError(error))
+            case .success(let res):
+              reply(wrapResult(res))
+            case .failure(let error):
+              reply(wrapError(error))
           }
         }
       }
     } else {
       referenceGetMetaDataChannel.setMessageHandler(nil)
     }
-    let referenceListChannel = FlutterBasicMessageChannel(
-      name: "dev.flutter.pigeon.firebase_storage_platform_interface.FirebaseStorageHostApi.referenceList",
-      binaryMessenger: binaryMessenger,
-      codec: codec
-    )
-    if let api {
+    let referenceListChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.firebase_storage_platform_interface.FirebaseStorageHostApi.referenceList", binaryMessenger: binaryMessenger, codec: codec)
+    if let api = api {
       referenceListChannel.setMessageHandler { message, reply in
         let args = message as! [Any?]
         let appArg = args[0] as! PigeonStorageFirebaseApp
@@ -549,44 +480,36 @@ class FirebaseStorageHostApiSetup {
         let optionsArg = args[2] as! PigeonListOptions
         api.referenceList(app: appArg, reference: referenceArg, options: optionsArg) { result in
           switch result {
-          case let .success(res):
-            reply(wrapResult(res))
-          case let .failure(error):
-            reply(wrapError(error))
+            case .success(let res):
+              reply(wrapResult(res))
+            case .failure(let error):
+              reply(wrapError(error))
           }
         }
       }
     } else {
       referenceListChannel.setMessageHandler(nil)
     }
-    let referenceListAllChannel = FlutterBasicMessageChannel(
-      name: "dev.flutter.pigeon.firebase_storage_platform_interface.FirebaseStorageHostApi.referenceListAll",
-      binaryMessenger: binaryMessenger,
-      codec: codec
-    )
-    if let api {
+    let referenceListAllChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.firebase_storage_platform_interface.FirebaseStorageHostApi.referenceListAll", binaryMessenger: binaryMessenger, codec: codec)
+    if let api = api {
       referenceListAllChannel.setMessageHandler { message, reply in
         let args = message as! [Any?]
         let appArg = args[0] as! PigeonStorageFirebaseApp
         let referenceArg = args[1] as! PigeonStorageReference
         api.referenceListAll(app: appArg, reference: referenceArg) { result in
           switch result {
-          case let .success(res):
-            reply(wrapResult(res))
-          case let .failure(error):
-            reply(wrapError(error))
+            case .success(let res):
+              reply(wrapResult(res))
+            case .failure(let error):
+              reply(wrapError(error))
           }
         }
       }
     } else {
       referenceListAllChannel.setMessageHandler(nil)
     }
-    let referenceGetDataChannel = FlutterBasicMessageChannel(
-      name: "dev.flutter.pigeon.firebase_storage_platform_interface.FirebaseStorageHostApi.referenceGetData",
-      binaryMessenger: binaryMessenger,
-      codec: codec
-    )
-    if let api {
+    let referenceGetDataChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.firebase_storage_platform_interface.FirebaseStorageHostApi.referenceGetData", binaryMessenger: binaryMessenger, codec: codec)
+    if let api = api {
       referenceGetDataChannel.setMessageHandler { message, reply in
         let args = message as! [Any?]
         let appArg = args[0] as! PigeonStorageFirebaseApp
@@ -594,22 +517,38 @@ class FirebaseStorageHostApiSetup {
         let maxSizeArg = args[2] is Int64 ? args[2] as! Int64 : Int64(args[2] as! Int32)
         api.referenceGetData(app: appArg, reference: referenceArg, maxSize: maxSizeArg) { result in
           switch result {
-          case let .success(res):
-            reply(wrapResult(res))
-          case let .failure(error):
-            reply(wrapError(error))
+            case .success(let res):
+              reply(wrapResult(res))
+            case .failure(let error):
+              reply(wrapError(error))
           }
         }
       }
     } else {
       referenceGetDataChannel.setMessageHandler(nil)
     }
-    let referencePutDataChannel = FlutterBasicMessageChannel(
-      name: "dev.flutter.pigeon.firebase_storage_platform_interface.FirebaseStorageHostApi.referencePutData",
-      binaryMessenger: binaryMessenger,
-      codec: codec
-    )
-    if let api {
+    let referenceStreamDataChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.firebase_storage_platform_interface.FirebaseStorageHostApi.referenceStreamData", binaryMessenger: binaryMessenger, codec: codec)
+    if let api = api {
+      referenceStreamDataChannel.setMessageHandler { message, reply in
+        let args = message as! [Any?]
+        let appArg = args[0] as! PigeonStorageFirebaseApp
+        let referenceArg = args[1] as! PigeonStorageReference
+        let maxSizeArg = args[2] is Int64 ? args[2] as! Int64 : Int64(args[2] as! Int32)
+        let handleArg = args[3] is Int64 ? args[3] as! Int64 : Int64(args[3] as! Int32)
+        api.referenceStreamData(app: appArg, reference: referenceArg, maxSize: maxSizeArg, handle: handleArg) { result in
+          switch result {
+            case .success(let res):
+              reply(wrapResult(res))
+            case .failure(let error):
+              reply(wrapError(error))
+          }
+        }
+      }
+    } else {
+      referenceStreamDataChannel.setMessageHandler(nil)
+    }
+    let referencePutDataChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.firebase_storage_platform_interface.FirebaseStorageHostApi.referencePutData", binaryMessenger: binaryMessenger, codec: codec)
+    if let api = api {
       referencePutDataChannel.setMessageHandler { message, reply in
         let args = message as! [Any?]
         let appArg = args[0] as! PigeonStorageFirebaseApp
@@ -617,30 +556,20 @@ class FirebaseStorageHostApiSetup {
         let dataArg = args[2] as! FlutterStandardTypedData
         let settableMetaDataArg = args[3] as! PigeonSettableMetadata
         let handleArg = args[4] is Int64 ? args[4] as! Int64 : Int64(args[4] as! Int32)
-        api.referencePutData(
-          app: appArg,
-          reference: referenceArg,
-          data: dataArg,
-          settableMetaData: settableMetaDataArg,
-          handle: handleArg
-        ) { result in
+        api.referencePutData(app: appArg, reference: referenceArg, data: dataArg, settableMetaData: settableMetaDataArg, handle: handleArg) { result in
           switch result {
-          case let .success(res):
-            reply(wrapResult(res))
-          case let .failure(error):
-            reply(wrapError(error))
+            case .success(let res):
+              reply(wrapResult(res))
+            case .failure(let error):
+              reply(wrapError(error))
           }
         }
       }
     } else {
       referencePutDataChannel.setMessageHandler(nil)
     }
-    let referencePutStringChannel = FlutterBasicMessageChannel(
-      name: "dev.flutter.pigeon.firebase_storage_platform_interface.FirebaseStorageHostApi.referencePutString",
-      binaryMessenger: binaryMessenger,
-      codec: codec
-    )
-    if let api {
+    let referencePutStringChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.firebase_storage_platform_interface.FirebaseStorageHostApi.referencePutString", binaryMessenger: binaryMessenger, codec: codec)
+    if let api = api {
       referencePutStringChannel.setMessageHandler { message, reply in
         let args = message as! [Any?]
         let appArg = args[0] as! PigeonStorageFirebaseApp
@@ -649,31 +578,20 @@ class FirebaseStorageHostApiSetup {
         let formatArg = args[3] is Int64 ? args[3] as! Int64 : Int64(args[3] as! Int32)
         let settableMetaDataArg = args[4] as! PigeonSettableMetadata
         let handleArg = args[5] is Int64 ? args[5] as! Int64 : Int64(args[5] as! Int32)
-        api.referencePutString(
-          app: appArg,
-          reference: referenceArg,
-          data: dataArg,
-          format: formatArg,
-          settableMetaData: settableMetaDataArg,
-          handle: handleArg
-        ) { result in
+        api.referencePutString(app: appArg, reference: referenceArg, data: dataArg, format: formatArg, settableMetaData: settableMetaDataArg, handle: handleArg) { result in
           switch result {
-          case let .success(res):
-            reply(wrapResult(res))
-          case let .failure(error):
-            reply(wrapError(error))
+            case .success(let res):
+              reply(wrapResult(res))
+            case .failure(let error):
+              reply(wrapError(error))
           }
         }
       }
     } else {
       referencePutStringChannel.setMessageHandler(nil)
     }
-    let referencePutFileChannel = FlutterBasicMessageChannel(
-      name: "dev.flutter.pigeon.firebase_storage_platform_interface.FirebaseStorageHostApi.referencePutFile",
-      binaryMessenger: binaryMessenger,
-      codec: codec
-    )
-    if let api {
+    let referencePutFileChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.firebase_storage_platform_interface.FirebaseStorageHostApi.referencePutFile", binaryMessenger: binaryMessenger, codec: codec)
+    if let api = api {
       referencePutFileChannel.setMessageHandler { message, reply in
         let args = message as! [Any?]
         let appArg = args[0] as! PigeonStorageFirebaseApp
@@ -681,138 +599,105 @@ class FirebaseStorageHostApiSetup {
         let filePathArg = args[2] as! String
         let settableMetaDataArg: PigeonSettableMetadata? = nilOrValue(args[3])
         let handleArg = args[4] is Int64 ? args[4] as! Int64 : Int64(args[4] as! Int32)
-        api.referencePutFile(
-          app: appArg,
-          reference: referenceArg,
-          filePath: filePathArg,
-          settableMetaData: settableMetaDataArg,
-          handle: handleArg
-        ) { result in
+        api.referencePutFile(app: appArg, reference: referenceArg, filePath: filePathArg, settableMetaData: settableMetaDataArg, handle: handleArg) { result in
           switch result {
-          case let .success(res):
-            reply(wrapResult(res))
-          case let .failure(error):
-            reply(wrapError(error))
+            case .success(let res):
+              reply(wrapResult(res))
+            case .failure(let error):
+              reply(wrapError(error))
           }
         }
       }
     } else {
       referencePutFileChannel.setMessageHandler(nil)
     }
-    let referenceDownloadFileChannel = FlutterBasicMessageChannel(
-      name: "dev.flutter.pigeon.firebase_storage_platform_interface.FirebaseStorageHostApi.referenceDownloadFile",
-      binaryMessenger: binaryMessenger,
-      codec: codec
-    )
-    if let api {
+    let referenceDownloadFileChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.firebase_storage_platform_interface.FirebaseStorageHostApi.referenceDownloadFile", binaryMessenger: binaryMessenger, codec: codec)
+    if let api = api {
       referenceDownloadFileChannel.setMessageHandler { message, reply in
         let args = message as! [Any?]
         let appArg = args[0] as! PigeonStorageFirebaseApp
         let referenceArg = args[1] as! PigeonStorageReference
         let filePathArg = args[2] as! String
         let handleArg = args[3] is Int64 ? args[3] as! Int64 : Int64(args[3] as! Int32)
-        api.referenceDownloadFile(
-          app: appArg,
-          reference: referenceArg,
-          filePath: filePathArg,
-          handle: handleArg
-        ) { result in
+        api.referenceDownloadFile(app: appArg, reference: referenceArg, filePath: filePathArg, handle: handleArg) { result in
           switch result {
-          case let .success(res):
-            reply(wrapResult(res))
-          case let .failure(error):
-            reply(wrapError(error))
+            case .success(let res):
+              reply(wrapResult(res))
+            case .failure(let error):
+              reply(wrapError(error))
           }
         }
       }
     } else {
       referenceDownloadFileChannel.setMessageHandler(nil)
     }
-    let referenceUpdateMetadataChannel = FlutterBasicMessageChannel(
-      name: "dev.flutter.pigeon.firebase_storage_platform_interface.FirebaseStorageHostApi.referenceUpdateMetadata",
-      binaryMessenger: binaryMessenger,
-      codec: codec
-    )
-    if let api {
+    let referenceUpdateMetadataChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.firebase_storage_platform_interface.FirebaseStorageHostApi.referenceUpdateMetadata", binaryMessenger: binaryMessenger, codec: codec)
+    if let api = api {
       referenceUpdateMetadataChannel.setMessageHandler { message, reply in
         let args = message as! [Any?]
         let appArg = args[0] as! PigeonStorageFirebaseApp
         let referenceArg = args[1] as! PigeonStorageReference
         let metadataArg = args[2] as! PigeonSettableMetadata
-        api
-          .referenceUpdateMetadata(app: appArg, reference: referenceArg,
-                                   metadata: metadataArg) { result in
-            switch result {
-            case let .success(res):
+        api.referenceUpdateMetadata(app: appArg, reference: referenceArg, metadata: metadataArg) { result in
+          switch result {
+            case .success(let res):
               reply(wrapResult(res))
-            case let .failure(error):
+            case .failure(let error):
               reply(wrapError(error))
-            }
           }
+        }
       }
     } else {
       referenceUpdateMetadataChannel.setMessageHandler(nil)
     }
-    let taskPauseChannel = FlutterBasicMessageChannel(
-      name: "dev.flutter.pigeon.firebase_storage_platform_interface.FirebaseStorageHostApi.taskPause",
-      binaryMessenger: binaryMessenger,
-      codec: codec
-    )
-    if let api {
+    let taskPauseChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.firebase_storage_platform_interface.FirebaseStorageHostApi.taskPause", binaryMessenger: binaryMessenger, codec: codec)
+    if let api = api {
       taskPauseChannel.setMessageHandler { message, reply in
         let args = message as! [Any?]
         let appArg = args[0] as! PigeonStorageFirebaseApp
         let handleArg = args[1] is Int64 ? args[1] as! Int64 : Int64(args[1] as! Int32)
         api.taskPause(app: appArg, handle: handleArg) { result in
           switch result {
-          case let .success(res):
-            reply(wrapResult(res))
-          case let .failure(error):
-            reply(wrapError(error))
+            case .success(let res):
+              reply(wrapResult(res))
+            case .failure(let error):
+              reply(wrapError(error))
           }
         }
       }
     } else {
       taskPauseChannel.setMessageHandler(nil)
     }
-    let taskResumeChannel = FlutterBasicMessageChannel(
-      name: "dev.flutter.pigeon.firebase_storage_platform_interface.FirebaseStorageHostApi.taskResume",
-      binaryMessenger: binaryMessenger,
-      codec: codec
-    )
-    if let api {
+    let taskResumeChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.firebase_storage_platform_interface.FirebaseStorageHostApi.taskResume", binaryMessenger: binaryMessenger, codec: codec)
+    if let api = api {
       taskResumeChannel.setMessageHandler { message, reply in
         let args = message as! [Any?]
         let appArg = args[0] as! PigeonStorageFirebaseApp
         let handleArg = args[1] is Int64 ? args[1] as! Int64 : Int64(args[1] as! Int32)
         api.taskResume(app: appArg, handle: handleArg) { result in
           switch result {
-          case let .success(res):
-            reply(wrapResult(res))
-          case let .failure(error):
-            reply(wrapError(error))
+            case .success(let res):
+              reply(wrapResult(res))
+            case .failure(let error):
+              reply(wrapError(error))
           }
         }
       }
     } else {
       taskResumeChannel.setMessageHandler(nil)
     }
-    let taskCancelChannel = FlutterBasicMessageChannel(
-      name: "dev.flutter.pigeon.firebase_storage_platform_interface.FirebaseStorageHostApi.taskCancel",
-      binaryMessenger: binaryMessenger,
-      codec: codec
-    )
-    if let api {
+    let taskCancelChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.firebase_storage_platform_interface.FirebaseStorageHostApi.taskCancel", binaryMessenger: binaryMessenger, codec: codec)
+    if let api = api {
       taskCancelChannel.setMessageHandler { message, reply in
         let args = message as! [Any?]
         let appArg = args[0] as! PigeonStorageFirebaseApp
         let handleArg = args[1] is Int64 ? args[1] as! Int64 : Int64(args[1] as! Int32)
         api.taskCancel(app: appArg, handle: handleArg) { result in
           switch result {
-          case let .success(res):
-            reply(wrapResult(res))
-          case let .failure(error):
-            reply(wrapError(error))
+            case .success(let res):
+              reply(wrapResult(res))
+            case .failure(let error):
+              reply(wrapError(error))
           }
         }
       }

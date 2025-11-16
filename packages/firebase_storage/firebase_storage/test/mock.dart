@@ -270,6 +270,20 @@ class MockReferencePlatform extends Mock
         returnValue: neverEndingFuture<ListResultPlatform>(),
         returnValueForMissingStub: neverEndingFuture<ListResultPlatform>());
   }
+
+  @override
+  Future<Uint8List?> getData(int maxSize) {
+    return super.noSuchMethod(Invocation.method(#getData, [maxSize]),
+        returnValue: neverEndingFuture<Uint8List?>(),
+        returnValueForMissingStub: neverEndingFuture<Uint8List?>());
+  }
+
+  @override
+  Stream<Uint8List> streamData(int maxSize) {
+    return super.noSuchMethod(Invocation.method(#streamData, [maxSize]),
+        returnValue: const Stream<Uint8List>.empty(),
+        returnValueForMissingStub: const Stream<Uint8List>.empty());
+  }
 }
 
 // UploadTaskPlatform Mock

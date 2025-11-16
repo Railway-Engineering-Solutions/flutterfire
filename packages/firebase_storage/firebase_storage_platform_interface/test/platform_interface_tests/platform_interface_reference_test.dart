@@ -157,6 +157,26 @@ void main() {
       }
       fail('Should have thrown an [UnimplementedError]');
     });
+
+    test('throws if getData()', () async {
+      try {
+        await referencePlatform!.getData(1024);
+      } on UnimplementedError catch (e) {
+        expect(e.message, equals('getData() is not implemented'));
+        return;
+      }
+      fail('Should have thrown an [UnimplementedError]');
+    });
+
+    test('throws if streamData()', () {
+      try {
+        referencePlatform!.streamData(1024);
+      } on UnimplementedError catch (e) {
+        expect(e.message, equals('streamData() is not implemented'));
+        return;
+      }
+      fail('Should have thrown an [UnimplementedError]');
+    });
   });
 }
 

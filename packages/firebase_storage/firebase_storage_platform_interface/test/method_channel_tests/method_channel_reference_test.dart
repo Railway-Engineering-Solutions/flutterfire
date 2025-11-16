@@ -115,5 +115,28 @@ void main() {
         await testExceptionHandling('PLATFORM', callMethod);
       });
     });
+
+    group('getData', () {
+      test(
+          'catch a [PlatformException] error and throws a [FirebaseException] error',
+          () async {
+        Function callMethod;
+        callMethod = () => ref.getData(1024);
+        await testExceptionHandling('PLATFORM', callMethod);
+      });
+    });
+
+    group('streamData', () {
+      test(
+          'catch a [PlatformException] error and throws a [FirebaseException] error',
+          () {
+        Function callMethod;
+        callMethod = () => ref.streamData(1024);
+        // Note: streamData returns a Stream, so we need to listen to it to trigger the error
+        expect(() {
+          ref.streamData(1024).listen((_) {}, onError: (_) {});
+        }, returnsNormally);
+      });
+    });
   });
 }
