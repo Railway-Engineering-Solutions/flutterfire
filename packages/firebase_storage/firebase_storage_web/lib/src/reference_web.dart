@@ -153,7 +153,7 @@ class ReferenceWeb extends ReferencePlatform {
     }
 
     try {
-      final url = await guard(() => getDownloadURL());
+      final url = await guard(getDownloadURL);
       final request = http.Request('GET', Uri.parse(url));
       final client = http.Client();
       final response = await client.send(request);
@@ -176,7 +176,8 @@ class ReferenceWeb extends ReferencePlatform {
             throw FirebaseException(
               plugin: 'firebase_storage',
               code: 'download-size-exceeded',
-              message: 'Downloaded data exceeds maximum allowed size of $maxSize bytes',
+              message:
+                  'Downloaded data exceeds maximum allowed size of $maxSize bytes',
             );
           }
           yield chunk;
@@ -190,7 +191,7 @@ class ReferenceWeb extends ReferencePlatform {
       }
       // Wrap other errors using guard's error handling
       guard(() {
-        throw e;
+        rethrow;
       });
     }
   }
