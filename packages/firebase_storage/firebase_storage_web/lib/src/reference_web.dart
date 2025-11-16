@@ -180,7 +180,7 @@ class ReferenceWeb extends ReferencePlatform {
                   'Downloaded data exceeds maximum allowed size of $maxSize bytes',
             );
           }
-          yield chunk;
+          yield Uint8List.fromList(chunk);
         }
       } finally {
         client.close();
@@ -189,10 +189,6 @@ class ReferenceWeb extends ReferencePlatform {
       if (e is FirebaseException) {
         rethrow;
       }
-      // Wrap other errors using guard's error handling
-      guard(() {
-        rethrow;
-      });
     }
   }
 
