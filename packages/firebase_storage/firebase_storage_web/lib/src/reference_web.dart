@@ -152,14 +152,13 @@ class ReferenceWeb extends ReferencePlatform {
       }
     }
 
+    final client = http.Client();
     try {
       final url = await guard(getDownloadURL);
       final request = http.Request('GET', Uri.parse(url));
-      final client = http.Client();
       final response = await client.send(request);
 
       if (response.statusCode != 200) {
-        client.close();
         throw FirebaseException(
           plugin: 'firebase_storage',
           code: 'unknown',
@@ -168,27 +167,29 @@ class ReferenceWeb extends ReferencePlatform {
       }
 
       int totalBytesReceived = 0;
-      try {
-        await for (final chunk in response.stream) {
-          totalBytesReceived += chunk.length;
-          if (maxSize > 0 && totalBytesReceived > maxSize) {
-            client.close();
-            throw FirebaseException(
-              plugin: 'firebase_storage',
-              code: 'download-size-exceeded',
-              message:
-                  'Downloaded data exceeds maximum allowed size of $maxSize bytes',
-            );
-          }
-          yield Uint8List.fromList(chunk);
+      await for (final chunk in response.stream) {
+        totalBytesReceived += chunk.length;
+        if (maxSize > 0 && totalBytesReceived > maxSize) {
+          throw FirebaseException(
+            plugin: 'firebase_storage',
+            code: 'download-size-exceeded',
+            message:
+                'Downloaded data exceeds maximum allowed size of $maxSize bytes',
+          );
         }
-      } finally {
-        client.close();
+        yield Uint8List.fromList(chunk);
       }
     } catch (e) {
       if (e is FirebaseException) {
         rethrow;
       }
+      throw FirebaseException(
+        plugin: 'firebase_storage',
+        code: 'unknown',
+        message: 'An error occurred while downloading file: $e',
+      );
+    } finally {
+      client.close();
     }
   }
 
