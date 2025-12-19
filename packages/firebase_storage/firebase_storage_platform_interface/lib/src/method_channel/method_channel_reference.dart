@@ -5,7 +5,6 @@
 
 import 'dart:async';
 import 'dart:io';
-import 'dart:typed_data';
 
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/services.dart';
@@ -154,18 +153,19 @@ class MethodChannelReference extends ReferencePlatform {
   Stream<Uint8List> streamData(int maxSize) async* {
     try {
       final handle = MethodChannelFirebaseStorage.nextMethodChannelHandleId;
-      final channelName = await MethodChannelFirebaseStorage.pigeonChannel
+      final uuid = await MethodChannelFirebaseStorage.pigeonChannel
           .referenceStreamData(
               pigeonFirebaseApp, pigeonReference, maxSize, handle);
 
-      final eventChannel = EventChannel(channelName);
+      final eventChannel =
+          MethodChannelFirebaseStorage.storageTaskChannel(uuid);
       final stream = eventChannel.receiveBroadcastStream();
 
       int totalBytesReceived = 0;
       await for (final event in stream) {
         if (event is Map) {
           final eventMap = Map<String, dynamic>.from(event);
-          
+
           // Check for error events
           if (eventMap.containsKey('error')) {
             final errorMap = Map<String, dynamic>.from(eventMap['error']);
@@ -175,7 +175,7 @@ class MethodChannelReference extends ReferencePlatform {
               message: errorMap['message'] ?? 'An error occurred',
             );
           }
-          
+
           // Check for data chunks
           if (eventMap.containsKey('data')) {
             final data = eventMap['data'];
@@ -185,15 +185,17 @@ class MethodChannelReference extends ReferencePlatform {
                 throw FirebaseException(
                   plugin: 'firebase_storage',
                   code: 'download-size-exceeded',
-                  message: 'Downloaded data exceeds maximum allowed size of $maxSize bytes',
+                  message:
+                      'Downloaded data exceeds maximum allowed size of $maxSize bytes',
                 );
               }
               yield data;
             }
           }
-          
+
           // Check for completion
-          if (eventMap.containsKey('complete') && eventMap['complete'] == true) {
+          if (eventMap.containsKey('complete') &&
+              eventMap['complete'] == true) {
             break;
           }
         } else if (event is Uint8List) {
@@ -203,7 +205,8 @@ class MethodChannelReference extends ReferencePlatform {
             throw FirebaseException(
               plugin: 'firebase_storage',
               code: 'download-size-exceeded',
-              message: 'Downloaded data exceeds maximum allowed size of $maxSize bytes',
+              message:
+                  'Downloaded data exceeds maximum allowed size of $maxSize bytes',
             );
           }
           yield event;
