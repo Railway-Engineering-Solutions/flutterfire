@@ -272,8 +272,9 @@ class MockReferencePlatform extends Mock
   }
 
   @override
-  Future<Uint8List?> getData(int maxSize) {
-    return super.noSuchMethod(Invocation.method(#getData, [maxSize]),
+  Future<Uint8List?> getData(int maxSize, [CancelToken? cancelToken]) {
+    return super.noSuchMethod(
+        Invocation.method(#getData, [maxSize, cancelToken]),
         returnValue: neverEndingFuture<Uint8List?>(),
         returnValueForMissingStub: neverEndingFuture<Uint8List?>());
   }

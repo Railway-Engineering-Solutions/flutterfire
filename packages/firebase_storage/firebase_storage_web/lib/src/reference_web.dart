@@ -3,6 +3,7 @@
 // for details. All rights reserved. Use of this source code is governed by a
 // BSD-style license that can be found in the LICENSE file.
 
+import 'dart:async';
 import 'dart:convert';
 import 'dart:js_interop';
 import 'dart:typed_data';
@@ -118,10 +119,11 @@ class ReferenceWeb extends ReferencePlatform {
   /// the operation will be canceled.
   @override
   Future<Uint8List?> getData(
-    int maxSize, {
+    int maxSize, [
+    CancelToken? cancelToken,
     @visibleForTesting
     Future<Uint8List> Function(Uri url) readBytes = http.readBytes,
-  }) async {
+  ]) async {
     if (maxSize > 0) {
       final metadata = await getMetadata();
       if (metadata.size! > maxSize) {
@@ -130,6 +132,48 @@ class ReferenceWeb extends ReferencePlatform {
     }
 
     return guard(() async {
+      if (cancelToken != null) {
+        if (cancelToken.isCancelled) {
+          throw FirebaseException(
+            plugin: 'firebase_storage',
+            code: 'canceled',
+            message: 'The operation was canceled.',
+          );
+        }
+
+        final Completer<Uint8List?> completer = Completer<Uint8List?>();
+        final List<int> data = [];
+        late StreamSubscription<Uint8List> subscription;
+
+        subscription = streamData(maxSize).listen(
+          data.addAll,
+          onError: (e) {
+            if (!completer.isCompleted) {
+              completer.completeError(e);
+            }
+          },
+          onDone: () {
+            if (!completer.isCompleted) {
+              completer.complete(Uint8List.fromList(data));
+            }
+          },
+          cancelOnError: true,
+        );
+
+        cancelToken.onCancelled.then((_) async {
+          if (!completer.isCompleted) {
+            await subscription.cancel();
+            completer.completeError(FirebaseException(
+              plugin: 'firebase_storage',
+              code: 'canceled',
+              message: 'The operation was canceled.',
+            ));
+          }
+        });
+
+        return completer.future;
+      }
+
       String url = await getDownloadURL();
       return readBytes(Uri.parse(url));
     });

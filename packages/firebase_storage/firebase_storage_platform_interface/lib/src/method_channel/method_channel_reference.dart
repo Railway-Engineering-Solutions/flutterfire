@@ -5,7 +5,6 @@
 
 import 'dart:async';
 import 'dart:io';
-import 'dart:typed_data';
 
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/services.dart';
@@ -141,8 +140,49 @@ class MethodChannelReference extends ReferencePlatform {
   }
 
   @override
-  Future<Uint8List?> getData(int maxSize) async {
+  Future<Uint8List?> getData(int maxSize, [CancelToken? cancelToken]) async {
     try {
+      if (cancelToken != null) {
+        if (cancelToken.isCancelled) {
+          throw FirebaseException(
+            plugin: 'firebase_storage',
+            code: 'canceled',
+            message: 'The operation was canceled.',
+          );
+        }
+
+        final Completer<Uint8List?> completer = Completer<Uint8List?>();
+        final List<int> data = [];
+        late StreamSubscription<Uint8List> subscription;
+
+        subscription = streamData(maxSize).listen(
+          data.addAll,
+          onError: (e) {
+            if (!completer.isCompleted) {
+              completer.completeError(e);
+            }
+          },
+          onDone: () {
+            if (!completer.isCompleted) {
+              completer.complete(Uint8List.fromList(data));
+            }
+          },
+          cancelOnError: true,
+        );
+
+        cancelToken.onCancelled.then((_) async {
+          if (!completer.isCompleted) {
+            await subscription.cancel();
+            completer.completeError(FirebaseException(
+              plugin: 'firebase_storage',
+              code: 'canceled',
+              message: 'The operation was canceled.',
+            ));
+          }
+        });
+
+        return await completer.future;
+      }
       return await MethodChannelFirebaseStorage.pigeonChannel
           .referenceGetData(pigeonFirebaseApp, pigeonReference, maxSize);
     } catch (e, stack) {
@@ -165,7 +205,7 @@ class MethodChannelReference extends ReferencePlatform {
       await for (final event in stream) {
         if (event is Map) {
           final eventMap = Map<String, dynamic>.from(event);
-          
+
           // Check for error events
           if (eventMap.containsKey('error')) {
             final errorMap = Map<String, dynamic>.from(eventMap['error']);
@@ -175,7 +215,7 @@ class MethodChannelReference extends ReferencePlatform {
               message: errorMap['message'] ?? 'An error occurred',
             );
           }
-          
+
           // Check for data chunks
           if (eventMap.containsKey('data')) {
             final data = eventMap['data'];
@@ -185,15 +225,17 @@ class MethodChannelReference extends ReferencePlatform {
                 throw FirebaseException(
                   plugin: 'firebase_storage',
                   code: 'download-size-exceeded',
-                  message: 'Downloaded data exceeds maximum allowed size of $maxSize bytes',
+                  message:
+                      'Downloaded data exceeds maximum allowed size of $maxSize bytes',
                 );
               }
               yield data;
             }
           }
-          
+
           // Check for completion
-          if (eventMap.containsKey('complete') && eventMap['complete'] == true) {
+          if (eventMap.containsKey('complete') &&
+              eventMap['complete'] == true) {
             break;
           }
         } else if (event is Uint8List) {
@@ -203,7 +245,8 @@ class MethodChannelReference extends ReferencePlatform {
             throw FirebaseException(
               plugin: 'firebase_storage',
               code: 'download-size-exceeded',
-              message: 'Downloaded data exceeds maximum allowed size of $maxSize bytes',
+              message:
+                  'Downloaded data exceeds maximum allowed size of $maxSize bytes',
             );
           }
           yield event;

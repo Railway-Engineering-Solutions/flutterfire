@@ -98,9 +98,18 @@ class Reference {
   ///
   /// If the [maxSize] (in bytes) is exceeded, the operation will be canceled. By
   /// default the [maxSize] is 10mb (10485760 bytes).
-  Future<Uint8List?> getData([int maxSize = 10485760]) async {
+  /// Asynchronously downloads the object at the StorageReference to a list in memory.
+  ///
+  /// Returns a [Uint8List] of the data.
+  ///
+  /// If the [maxSize] (in bytes) is exceeded, the operation will be canceled. By
+  /// default the [maxSize] is 10mb (10485760 bytes).
+  Future<Uint8List?> getData([
+    int maxSize = 10485760,
+    CancelToken? cancelToken,
+  ]) async {
     assert(maxSize > 0);
-    return _delegate.getData(maxSize);
+    return _delegate.getData(maxSize, cancelToken);
   }
 
   /// Streams the object at the StorageReference as chunks of data.

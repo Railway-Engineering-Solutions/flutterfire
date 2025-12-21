@@ -29,7 +29,8 @@ export 'package:firebase_storage_platform_interface/firebase_storage_platform_in
         FullMetadata,
         SettableMetadata,
         PutStringFormat,
-        TaskState;
+        TaskState,
+        CancelToken;
 
 part 'src/firebase_storage.dart';
 part 'src/list_result.dart';

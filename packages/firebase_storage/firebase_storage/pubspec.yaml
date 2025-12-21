@@ -21,8 +21,10 @@ environment:
 dependencies:
   firebase_core: ^4.2.1
   firebase_core_platform_interface: ^6.0.2
-  firebase_storage_platform_interface: ^5.2.15
-  firebase_storage_web: ^3.11.0
+  firebase_storage_platform_interface:
+    path: ../firebase_storage_platform_interface
+  firebase_storage_web:
+    path: ../firebase_storage_web
   flutter:
     sdk: flutter
 

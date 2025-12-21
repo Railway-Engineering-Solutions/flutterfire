@@ -339,6 +339,19 @@ Future<void> main() async {
       test('throws AssertionError if maxSize is not greater than 0', () {
         expect(() => testRef.getData(0), throwsAssertionError);
       });
+
+      test('verify delegate method is called with CancelToken', () async {
+        final cancelToken = CancelToken();
+        final testData = Uint8List.fromList([1, 2, 3]);
+
+        when(mockReference.getData(10485760, cancelToken))
+            .thenAnswer((_) => Future.value(testData));
+
+        final result = await testRef.getData(10485760, cancelToken);
+
+        expect(result, testData);
+        verify(mockReference.getData(10485760, cancelToken));
+      });
     });
 
     group('streamData()', () {

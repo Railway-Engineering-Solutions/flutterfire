@@ -5,6 +5,7 @@
 
 library firebase_storage_platform_interface;
 
+export 'src/cancel_token.dart';
 export 'src/full_metadata.dart';
 export 'src/list_options.dart';
 export 'src/platform_interface/platform_interface_firebase_storage.dart';

@@ -122,7 +122,7 @@ abstract class ReferencePlatform extends PlatformInterface {
   ///
   /// Returns a [Uint8List] of the data. If the [maxSize] (in bytes) is exceeded,
   /// the operation will be canceled.
-  Future<Uint8List?> getData(int maxSize) async {
+  Future<Uint8List?> getData(int maxSize, [CancelToken? cancelToken]) async {
     throw UnimplementedError('getData() is not implemented');
   }
 
