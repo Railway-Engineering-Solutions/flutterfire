@@ -718,11 +718,7 @@ extension type DocumentReferenceJsImpl._(JSObject _) implements JSObject {
   external JSString get type;
 }
 
-@JS('QueryConstraint')
-@staticInterop
-abstract class QueryConstraintJsImpl {}
-
-extension QueryConstraintJsImplExtension on QueryConstraintJsImpl {
+extension type QueryConstraintJsImpl._(JSObject _) implements JSObject {
   external JSString get type;
 }
 
