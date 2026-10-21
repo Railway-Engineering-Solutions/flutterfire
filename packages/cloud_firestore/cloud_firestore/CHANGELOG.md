@@ -1,3 +1,7 @@
+## Unreleased (Trax fork)
+
+ - **FIX**(firestore,android): chunk large query snapshots across bounded platform-channel envelopes.
+
 ## 7.1.0
 
  - **FIX**(iOS): **Security Update:** Removed root certificates associated with compromised eMudhra intermediate CAs from the embedded trust store. ([#16933](//github.com/firebase/firebase-ios-sdk/issues/16933))

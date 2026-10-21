@@ -1,3 +1,7 @@
+## Unreleased (Trax fork)
+
+ - **FIX**(firestore,android): reassemble chunked query snapshots into one logical snapshot.
+
 ## 8.1.0
 
  - **FIX**(cloud_firestore): stop dropping filters, settings and instance on copies ([#18819](https://github.com/firebase/flutterfire/issues/18819)). ([b9c4a8ec](https://github.com/firebase/flutterfire/commit/b9c4a8ecee23701cf43051abd6264a2d7dcc69fd))

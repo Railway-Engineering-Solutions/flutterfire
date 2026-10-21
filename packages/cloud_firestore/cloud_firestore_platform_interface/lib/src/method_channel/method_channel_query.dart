@@ -16,6 +16,7 @@ import 'package:flutter/services.dart';
 import 'method_channel_aggregate_query.dart';
 import 'method_channel_firestore.dart';
 import 'method_channel_query_snapshot.dart';
+import 'query_snapshot_chunk_assembler.dart';
 import 'utils/exception.dart';
 
 /// An implementation of [QueryPlatform] that uses [MethodChannel] to
@@ -202,15 +203,33 @@ class MethodChannelQuery extends QueryPlatform {
           listenSource,
         );
 
+    // Android may split a large snapshot into bounded chunk envelopes (see
+    // QuerySnapshotChunkAssembler); other platforms emit InternalQuerySnapshot
+    // directly. The assembler is scoped to this listen, so cancelling drops
+    // any partial snapshot with it.
+    final snapshotAssembler = QuerySnapshotChunkAssembler();
+
     yield* MethodChannelFirebaseFirestore.querySnapshotChannel(observerId)
         .receiveGuardedBroadcastStream(onError: convertPlatformException)
-        .map((snapshot) {
-          // With Pigeon 26, the native side emits the generated Pigeon class
-          // directly through the Pigeon-aware codec, so we receive a fully
-          // decoded `InternalQuerySnapshot` here (no manual decode required).
-          final result = snapshot as InternalQuerySnapshot;
-          return MethodChannelQuerySnapshot(firestore, result);
-        });
+        .transform(
+          StreamTransformer<dynamic, QuerySnapshotPlatform>.fromHandlers(
+            handleData: (snapshot, sink) {
+              try {
+                final result = snapshotAssembler.add(snapshot);
+                if (result != null) {
+                  sink.add(MethodChannelQuerySnapshot(firestore, result));
+                }
+              } catch (error, stackTrace) {
+                snapshotAssembler.reset();
+                sink.addError(error, stackTrace);
+              }
+            },
+            handleError: (error, stackTrace, sink) {
+              snapshotAssembler.reset();
+              sink.addError(error, stackTrace);
+            },
+          ),
+        );
   }
 
   @override
