@@ -1,3 +1,7 @@
+## Unreleased (Trax fork)
+
+* Align the Apple SDK requirement with Firebase 13.1.1 and firebase_core 5.1.0. Keep the bounded Android snapshot transport and Wasm query cursor fixes.
+
 ## 7.0.0
 
 > Note: This release has breaking changes.
